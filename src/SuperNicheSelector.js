@@ -185,7 +185,7 @@ const SuperNicheSelector = () => {
       padding: '20px'
     }}>
       <img 
-        src="/logo.png" 
+        src="https://raw.githubusercontent.com/pantheonmarketing/super-niche-selector/main/public/logo.png"
         alt="Super Niche Selector Logo" 
         style={{ maxWidth: '600px', width: '100%', height: 'auto', marginBottom: '40px' }}
       />

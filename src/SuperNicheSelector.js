@@ -177,7 +177,7 @@ const SuperNicheSelector = () => {
 
   return (
     <div style={{ 
-      backgroundColor: isDarkMode ? '#1a1a1a' : 'black', 
+      backgroundColor: '#020101', // Always dark black
       minHeight: '100vh', 
       display: 'flex', 
       flexDirection: 'column', 
@@ -196,7 +196,8 @@ const SuperNicheSelector = () => {
         padding: '20px', 
         borderRadius: '8px', 
         boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-        ...darkModeStyles
+        backgroundColor: isDarkMode ? '#333' : '#f9f9f9',
+        color: isDarkMode ? '#fff' : '#333',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
           <button onClick={toggleDarkMode} style={{ padding: '10px', borderRadius: '5px', border: 'none', cursor: 'pointer' }}>

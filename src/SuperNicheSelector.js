@@ -10,7 +10,7 @@ const SuperNicheSelector = () => {
   const [selectedElements, setSelectedElements] = useState([]);
   const [customNiche, setCustomNiche] = useState('');
   const [superNiche, setSuperNiche] = useState('');
-  const [cpl, setCpl] = useState(15.01);
+  const [cpl, setCpl] = useState(15.00);
   const [countries, setCountries] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const { toPDF, targetRef } = usePDF({filename: 'super-niche-selector.pdf'});
@@ -31,7 +31,7 @@ const SuperNicheSelector = () => {
   const topCountries = ['USA', 'UK', 'Australia', 'Canada'];
 
   const calculateCPL = () => {
-    let baseCPL = 15.01;
+    let baseCPL = 15.00;
     let nicheFactor = 1;
     let elementCount = 0;
     let rarityFactor = 1;

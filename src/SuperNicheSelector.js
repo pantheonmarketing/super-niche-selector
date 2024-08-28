@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Select from 'react-select';
+import Select, { StylesConfig } from 'react-select';
 import { Tooltip } from 'react-tooltip';
 import { usePDF } from 'react-to-pdf';
 import { useMediaQuery } from 'react-responsive';
@@ -12,6 +12,7 @@ const SuperNicheSelector = () => {
   const [superNiche, setSuperNiche] = useState('');
   const [cpl, setCpl] = useState(15.00);
   const [countries, setCountries] = useState([]);
+  const [languages, setLanguages] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const { toPDF, targetRef } = usePDF({filename: 'super-niche-selector.pdf'});
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
@@ -21,11 +22,13 @@ const SuperNicheSelector = () => {
     { type: 'Country', options: ['USA', 'UK', 'Canada', 'Australia', 'Other'] },
     { type: 'Language', options: ['English', 'Spanish', 'French', 'Mandarin', 'Other'] },
     { type: 'Religion', options: ['Christian', 'Muslim', 'Hindu', 'Buddhist', 'No Religion'] },
-    { type: 'Profession', options: ['Teacher', 'Doctor', 'Engineer', 'Artist', 'No Specific Profession'] },
+    { type: 'Profession', options: ['Teacher', 'Doctor', 'Engineer', 'Artist', 'Nurse', '9-5 Employee', 'Real Estate Agent', 'Entrepreneur', 'No Specific Profession'] },
     { type: 'Age Group', options: ['18-25', '26-40', '41-60', '60+'] },
     { type: 'Gender', options: ['Male', 'Female'] },
     { type: 'Race', options: ['White', 'Black', 'Asian', 'No Specific'] },
     { type: 'Marital Status', options: ['Single', 'Married', 'Divorced'] },
+    { type: 'Parent Type', options: ['Mom', 'Dad', 'Not a Parent'] },
+    { type: 'Education Level', options: ['High School', 'Associate Degree', 'Bachelor\'s Degree', 'Master\'s Degree', 'Doctorate', 'No Specific'] },
   ];
 
   const topCountries = ['USA', 'UK', 'Australia', 'Canada'];
@@ -40,17 +43,19 @@ const SuperNicheSelector = () => {
       Country: { USA: 1, UK: 0.9, Canada: 0.9, Australia: 0.9, Other: 0.7 },
       Language: { English: 1, Spanish: 0.9, French: 0.8, Mandarin: 0.7, Other: 0.6 },
       Religion: { Christian: 1, Muslim: 0.9, Hindu: 0.9, Buddhist: 0.9, 'No Religion': 1 },
-      Profession: { Teacher: 0.9, Doctor: 0.9, Engineer: 0.9, Artist: 0.8, 'No Specific Profession': 1 },
+      Profession: { Teacher: 0.9, Doctor: 0.9, Engineer: 0.9, Artist: 0.8, Nurse: 0.9, '9-5 Employee': 1, 'Real Estate Agent': 0.8, Entrepreneur: 0.7, 'No Specific Profession': 1 },
       'Age Group': { '18-25': 1, '26-40': 1, '41-60': 0.9, '60+': 0.8 },
       Gender: { Male: 1, Female: 1, 'No Specific': 1 },
       Race: { White: 1, Black: 0.9, Asian: 0.9, 'No Specific': 1 },
-      'Marital Status': { Single: 1, Married: 1, Divorced: 0.9 }
+      'Marital Status': { Single: 1, Married: 1, Divorced: 0.9 },
+      'Parent Type': { Mom: 0.9, Dad: 0.9, 'Not a Parent': 1 },
+      'Education Level': { 'High School': 1, 'Associate Degree': 0.9, 'Bachelor\'s Degree': 0.8, 'Master\'s Degree': 0.7, 'Doctorate': 0.6, 'No Specific': 1 }
     };
 
     selectedElements.forEach(element => {
       if (element.option !== 'No Specific' && element.option !== 'No Religion' && element.option !== 'No Specific Profession') {
         elementCount++;
-        nicheFactor *= rarityScores[element.type][element.option] || 0.9;
+        nicheFactor *= rarityScores[element.type]?.[element.option] || 0.9;
       }
     });
 
@@ -144,6 +149,24 @@ const SuperNicheSelector = () => {
         setCountries(countryOptions);
       })
       .catch(error => console.error('Error fetching countries:', error));
+
+    // Fetch languages
+    fetch('https://restcountries.com/v3.1/all')
+      .then(response => response.json())
+      .then(data => {
+        const languageSet = new Set();
+        data.forEach(country => {
+          if (country.languages) {
+            Object.values(country.languages).forEach(lang => languageSet.add(lang));
+          }
+        });
+        const languageOptions = Array.from(languageSet).sort().map(lang => ({
+          value: lang,
+          label: lang
+        }));
+        setLanguages(languageOptions);
+      })
+      .catch(error => console.error('Error fetching languages:', error));
   }, []);
 
   const toggleDarkMode = () => {
@@ -158,7 +181,9 @@ const SuperNicheSelector = () => {
     'Age Group': 'Select the age range of your target audience',
     'Gender': 'Choose the gender if it is specific to your niche',
     'Race': 'Select the racial background if relevant to your niche',
-    'Marital Status': 'Choose the marital status if it affects your niche'
+    'Marital Status': 'Choose the marital status if it affects your niche',
+    'Parent Type': 'Select the parent type if relevant to your niche',
+    'Education Level': 'Select the education level of your target audience'
   };
 
   const darkModeStyles = {
@@ -173,6 +198,34 @@ const SuperNicheSelector = () => {
       link.href = canvas.toDataURL();
       link.click();
     });
+  };
+
+  const customSelectStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      backgroundColor: isDarkMode ? '#444' : '#fff',
+      color: isDarkMode ? '#fff' : '#333',
+      borderColor: isDarkMode ? '#666' : '#ccc',
+    }),
+    menu: (provided, state) => ({
+      ...provided,
+      backgroundColor: isDarkMode ? '#555' : '#fff',
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isFocused
+        ? isDarkMode ? '#666' : '#f0f0f0'
+        : isDarkMode ? '#555' : '#fff',
+      color: isDarkMode ? '#fff' : '#333',
+    }),
+    singleValue: (provided, state) => ({
+      ...provided,
+      color: isDarkMode ? '#fff' : '#333',
+    }),
+    input: (provided, state) => ({
+      ...provided,
+      color: isDarkMode ? '#fff' : '#333',
+    }),
   };
 
   return (
@@ -250,24 +303,19 @@ const SuperNicheSelector = () => {
                   <h3 style={{ marginTop: '0', color: isDarkMode ? '#fff' : '#333' }} data-tooltip-id={type} data-tooltip-content={tooltips[type]}>{type}</h3>
                   <Tooltip id={type} />
                   {type === 'Country' ? (
-                    <div>
-                      <div style={{ marginBottom: '10px', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                        {topCountries.map(country => (
-                          <button
-                            key={country}
-                            onClick={() => handleQuickCountrySelect(country)}
-                            style={buttonStyle(selectedElements.some(el => el.type === 'Country' && el.option === country))}
-                          >
-                            {country}
-                          </button>
-                        ))}
-                      </div>
-                      <Select
-                        options={countries}
-                        onChange={handleCountrySelect}
-                        placeholder="Search for other countries..."
-                      />
-                    </div>
+                    <Select
+                      options={countries}
+                      onChange={(selectedOption) => handleElementSelect('Country', selectedOption.value)}
+                      placeholder="Select a country..."
+                      styles={customSelectStyles}
+                    />
+                  ) : type === 'Language' ? (
+                    <Select
+                      options={languages}
+                      onChange={(selectedOption) => handleElementSelect('Language', selectedOption.value)}
+                      placeholder="Select a language..."
+                      styles={customSelectStyles}
+                    />
                   ) : (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                       {options.map(option => (

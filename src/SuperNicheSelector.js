@@ -53,7 +53,7 @@ const SuperNicheSelector = () => {
     };
 
     selectedElements.forEach(element => {
-      if (element.option !== 'No Specific' && element.option !== 'No Religion' && element.option !== 'No Specific Profession') {
+      if (element.option !== 'No Specific' && element.option !== 'No Religion' && element.option !== 'No Specific Profession' && element.option !== 'All') {
         elementCount++;
         nicheFactor *= rarityScores[element.type]?.[element.option] || 0.9;
       }
@@ -118,7 +118,13 @@ const SuperNicheSelector = () => {
   const updateSuperNiche = () => {
     console.log('Updating super niche');
     if (customNiche && selectedCategory) {
-      const elements = selectedElements.map(el => el.option).join(', ');
+      const elements = selectedElements.map(el => {
+        if (el.type === 'Gender') {
+          const genders = selectedElements.filter(g => g.type === 'Gender').map(g => g.option);
+          return genders.length > 1 ? genders.join(' and ') : genders[0];
+        }
+        return el.option;
+      }).join(', ');
       const newSuperNiche = `${customNiche} for ${elements} in the ${selectedCategory} niche`;
       console.log('New super niche:', newSuperNiche);
       setSuperNiche(newSuperNiche);
@@ -333,6 +339,18 @@ const SuperNicheSelector = () => {
                       placeholder="Select a language..."
                       styles={customSelectStyles}
                     />
+                  ) : type === 'Gender' ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                      {options.map(option => (
+                        <button
+                          key={option}
+                          onClick={() => handleElementSelect(type, option)}
+                          style={buttonStyle(selectedElements.some(el => el.type === type && el.option === option))}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
                   ) : (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                       {options.map(option => (

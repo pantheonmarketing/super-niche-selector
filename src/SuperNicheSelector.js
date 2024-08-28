@@ -24,7 +24,7 @@ const SuperNicheSelector = () => {
     { type: 'Religion', options: ['Christian', 'Muslim', 'Hindu', 'Buddhist', 'No Religion'] },
     { type: 'Profession', options: ['Teacher', 'Doctor', 'Engineer', 'Artist', 'Nurse', '9-5 Employee', 'Real Estate Agent', 'Entrepreneur', 'No Specific Profession'] },
     { type: 'Age Group', options: ['18-25', '26-40', '41-60', '60+'] },
-    { type: 'Gender', options: ['Male', 'Female'] },
+    { type: 'Gender', options: ['Male', 'Female', 'No Specific'] },
     { type: 'Race', options: ['White', 'Black', 'Asian', 'No Specific'] },
     { type: 'Marital Status', options: ['Single', 'Married', 'Divorced'] },
     { type: 'Parent Type', options: ['Mom', 'Dad', 'Not a Parent'] },
@@ -127,12 +127,56 @@ const SuperNicheSelector = () => {
     }
   };
 
+  const lightModeColors = {
+    background: '#f0f2f5',  // Light grey background
+    elementBackground: '#ffffff',  // White for element backgrounds
+    text: '#333333',  // Dark grey for text
+    border: '#d1d5db',  // Light grey for borders
+  };
+
+  const darkModeColors = {
+    background: '#333333',
+    elementBackground: '#444444',
+    text: '#ffffff',
+    border: '#666666',
+  };
+
+  const currentTheme = isDarkMode ? darkModeColors : lightModeColors;
+
+  const customSelectStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      backgroundColor: currentTheme.elementBackground,
+      color: currentTheme.text,
+      borderColor: currentTheme.border,
+    }),
+    menu: (provided, state) => ({
+      ...provided,
+      backgroundColor: currentTheme.elementBackground,
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isFocused
+        ? isDarkMode ? '#666' : '#e2e8f0'
+        : currentTheme.elementBackground,
+      color: currentTheme.text,
+    }),
+    singleValue: (provided, state) => ({
+      ...provided,
+      color: currentTheme.text,
+    }),
+    input: (provided, state) => ({
+      ...provided,
+      color: currentTheme.text,
+    }),
+  };
+
   const buttonStyle = (isSelected) => ({
     padding: '8px 12px',
     margin: '4px',
-    backgroundColor: isSelected ? '#4CAF50' : '#f0f0f0',
-    color: isSelected ? 'white' : 'black',
-    border: 'none',
+    backgroundColor: isSelected ? '#4CAF50' : currentTheme.elementBackground,
+    color: isSelected ? 'white' : currentTheme.text,
+    border: `1px solid ${currentTheme.border}`,
     borderRadius: '4px',
     cursor: 'pointer',
     transition: 'background-color 0.3s',
@@ -186,11 +230,6 @@ const SuperNicheSelector = () => {
     'Education Level': 'Select the education level of your target audience'
   };
 
-  const darkModeStyles = {
-    backgroundColor: isDarkMode ? '#333' : '#f9f9f9',
-    color: isDarkMode ? '#fff' : '#333',
-  };
-
   const exportToPNG = () => {
     html2canvas(targetRef.current).then((canvas) => {
       const link = document.createElement('a');
@@ -198,34 +237,6 @@ const SuperNicheSelector = () => {
       link.href = canvas.toDataURL();
       link.click();
     });
-  };
-
-  const customSelectStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      backgroundColor: isDarkMode ? '#444' : '#fff',
-      color: isDarkMode ? '#fff' : '#333',
-      borderColor: isDarkMode ? '#666' : '#ccc',
-    }),
-    menu: (provided, state) => ({
-      ...provided,
-      backgroundColor: isDarkMode ? '#555' : '#fff',
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isFocused
-        ? isDarkMode ? '#666' : '#f0f0f0'
-        : isDarkMode ? '#555' : '#fff',
-      color: isDarkMode ? '#fff' : '#333',
-    }),
-    singleValue: (provided, state) => ({
-      ...provided,
-      color: isDarkMode ? '#fff' : '#333',
-    }),
-    input: (provided, state) => ({
-      ...provided,
-      color: isDarkMode ? '#fff' : '#333',
-    }),
   };
 
   return (
@@ -249,8 +260,8 @@ const SuperNicheSelector = () => {
         padding: '20px', 
         borderRadius: '8px', 
         boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-        backgroundColor: isDarkMode ? '#333' : '#f9f9f9',
-        color: isDarkMode ? '#fff' : '#333',
+        backgroundColor: currentTheme.background,
+        color: currentTheme.text,
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
           <button onClick={toggleDarkMode} style={{ padding: '10px', borderRadius: '5px', border: 'none', cursor: 'pointer' }}>
@@ -266,7 +277,7 @@ const SuperNicheSelector = () => {
           </div>
         </div>
         <div style={{ marginBottom: '20px' }}>
-          <h2 style={{ color: isDarkMode ? '#fff' : '#444' }}>Step 1: Choose a category from the Big 3</h2>
+          <h2 style={{ color: currentTheme.text }}>Step 1: Choose a category from the Big 3</h2>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             {categories.map(category => (
               <button
@@ -282,25 +293,31 @@ const SuperNicheSelector = () => {
         
         {selectedCategory && (
           <div style={{ marginBottom: '20px' }}>
-            <h2 style={{ color: isDarkMode ? '#fff' : '#444' }}>Step 2: Write your niche</h2>
+            <h2 style={{ color: currentTheme.text }}>Step 2: Write your niche</h2>
             <input
               type="text"
               value={customNiche}
               onChange={(e) => setCustomNiche(e.target.value)}
               placeholder="Enter your niche here"
-              style={{ width: '100%', padding: '10px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ddd' }}
+              style={{ width: '100%', padding: '10px', fontSize: '16px', borderRadius: '4px', border: `1px solid ${currentTheme.border}` }}
             />
           </div>
         )}
 
         {selectedCategory && (
           <div style={{ marginBottom: '20px' }}>
-            <h2 style={{ color: isDarkMode ? '#fff' : '#444' }}>Step 3: Build your super niche</h2>
+            <h2 style={{ color: currentTheme.text }}>Step 3: Build your super niche</h2>
             <p>Select elements to narrow down your niche:</p>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '10px' }}>
               {elements.map(({ type, options }) => (
-                <div key={type} style={{ backgroundColor: isDarkMode ? '#444' : '#fff', padding: '10px', borderRadius: '5px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
-                  <h3 style={{ marginTop: '0', color: isDarkMode ? '#fff' : '#333' }} data-tooltip-id={type} data-tooltip-content={tooltips[type]}>{type}</h3>
+                <div key={type} style={{ 
+                  backgroundColor: currentTheme.elementBackground, 
+                  padding: '10px', 
+                  borderRadius: '5px', 
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                  border: `1px solid ${currentTheme.border}`,
+                }}>
+                  <h3 style={{ marginTop: '0', color: currentTheme.text }} data-tooltip-id={type} data-tooltip-content={tooltips[type]}>{type}</h3>
                   <Tooltip id={type} />
                   {type === 'Country' ? (
                     <Select
@@ -336,17 +353,17 @@ const SuperNicheSelector = () => {
         )}
         
         {superNiche && (
-          <div style={{ marginBottom: '20px', backgroundColor: isDarkMode ? '#444' : '#e9ecef', padding: '15px', borderRadius: '5px' }}>
-            <h2 style={{ color: isDarkMode ? '#fff' : '#333', marginTop: '0' }}>Your Super Niche:</h2>
-            <p style={{ fontSize: '18px', color: isDarkMode ? '#fff' : '#444' }}>{superNiche}</p>
+          <div style={{ marginBottom: '20px', backgroundColor: currentTheme.elementBackground, padding: '15px', borderRadius: '5px' }}>
+            <h2 style={{ color: currentTheme.text, marginTop: '0' }}>Your Super Niche:</h2>
+            <p style={{ fontSize: '18px', color: currentTheme.text }}>{superNiche}</p>
           </div>
         )}
         
-        <div style={{ backgroundColor: isDarkMode ? '#444' : '#d4edda', padding: '15px', borderRadius: '5px' }}>
-          <h2 style={{ color: isDarkMode ? '#fff' : '#333', marginTop: '0' }}>Estimated Cost Per Lead (CPL)</h2>
-          <p style={{ fontSize: '24px', fontWeight: 'bold', color: isDarkMode ? '#fff' : '#28a745' }}>${cpl}</p>
-          <p style={{ color: isDarkMode ? '#fff' : '#444' }}>The more specific your niche, the lower your estimated CPL!</p>
-          <p style={{ color: isDarkMode ? '#fff' : '#666', fontSize: '14px' }}>Note: Selecting USA, English language, or White race doesn't reduce CPL due to high competition.</p>
+        <div style={{ backgroundColor: currentTheme.elementBackground, padding: '15px', borderRadius: '5px' }}>
+          <h2 style={{ color: currentTheme.text, marginTop: '0' }}>Estimated Cost Per Lead (CPL)</h2>
+          <p style={{ fontSize: '24px', fontWeight: 'bold', color: currentTheme.text }}>${cpl}</p>
+          <p style={{ color: currentTheme.text }}>The more specific your niche, the lower your estimated CPL!</p>
+          <p style={{ color: currentTheme.text, fontSize: '14px' }}>Note: Selecting USA, English language, or White race doesn't reduce CPL due to high competition.</p>
         </div>
       </div>
     </div>
